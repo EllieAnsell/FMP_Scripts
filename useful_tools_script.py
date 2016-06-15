@@ -1,0 +1,636 @@
+import maya.cmds as cm
+import maya.cmds as mc
+'''
+This script contains useful tools I used during my major project, including:
+- Renaming, replace names
+- Rebuild curves- used for hair. 
+- Attribute setting (Used for lighting)
+- Vray subdivisions (used to quickly select multiple objects and add vray subdivision)
+- Spline dynamic curve rig 
+'''
+
+#-----------------------------------------------------------------------------------------Rename selection  
+def renameSelection(newName, option):
+    name=cm.ls(sl=True)
+    if option==1:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_JNT_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_JNT_'+str(i+1))
+    elif option==2:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_HDL_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_HDL_'+str(i+1))
+    elif option==3:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_CTRL_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_CTRL_'+str(i+1))
+    elif option==4:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_GRP_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_GRP_'+str(i+1))
+    elif option==5:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_EFF_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_EFF_'+str(i+1))   
+    elif option==6:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_CRV_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_CRV_'+str(i+1))    
+    elif option==7:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_CLST_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_CLST_'+str(i+1))  
+    elif option==8:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_LOC_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_LOC_'+str(i+1))    
+    elif option==9:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_GEO_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_GEO_'+str(i+1)) 
+    elif option==10:
+        for i in range(0, len(cm.ls(sl=True))):
+            if i<10:
+                cm.rename(name[i], str(newName)+'_LHT_'+str(0)+str(i+1))     
+            else:
+                cm.rename(name[i], str(newName)+'_LHT_'+str(i+1)) 
+#^-----------------------------------------------------------------------------------------Rename selection^   
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////#
+#--------------------------------------------------------------------------------------------------RENDERING
+def assignObjectID(_object):
+    object = cm.ls(sl=True)
+    cm.setAttr(object[0]+str('.vrayObjectID'), 1)
+    maya.mel.eval('setAttr "whole_scene_clean_1_:cauldronShape.vrayObjectID" 1;')
+    
+def assignSurfaceShader(_colour):
+    object = cm.ls(sl=True)
+    for i in range(0, len(object)):
+        if _colour ==1:
+            maya.mel.eval('sets -e -forceElement surfaceShader3SG;') #red
+        elif _colour == 2:
+            maya.mel.eval('sets -e -forceElement surfaceShader4SG;') #green
+        elif _colour == 3:
+            maya.mel.eval('sets -e -forceElement surfaceShader2SG;') #blue
+        elif _colour == 4:
+            maya.mel.eval('sets -e -forceElement surfaceShader5SG;') #black
+        elif _colour == 5:
+            maya.mel.eval('sets -e -forceElement surfaceShader6SG;') #white
+        
+#^-------------------------------------------------------------------------------------------------Rendering^   
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////#
+#--------------------------------------------------------------------------------------------------LIGHTING
+def setSubdivs(subDiv_value):
+    object = cm.ls(sl=True)
+    print object[0]
+    for i in range(0, len(object)):
+        cm.setAttr(object[i]+str('.subdivs'), subDiv_value)
+
+def vraySubdivisions():
+    shapes = mc.ls(sl=1, dag=1, lf=1, s=1)
+    for shape in shapes:
+        mc.vray("addAttributesFromGroup", shape, "vray_subdivision", 3)
+        
+def setAttribute(value, attribute):
+    for i in cm.ls(sl=True):
+        cm.setAttr(i+"."+str(attribute), value)
+
+def setAttribute2(v1, v2, v3, attribute):
+    print v1, v2, v3
+    for i in cm.ls(sl=True):
+        cm.setAttr(i+"."+str(attribute), v1, v2, v3)
+#^-------------------------------------------------------------------------------------------------Lighting^   
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////#
+#--------------------------------------------------------------------------------------------------RIGGING    
+def autoIKRightArmRig():
+    name=cm.ls(sl=True)
+    for i in range(0, len(name)):
+        maya.mel.eval('makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 -pn 1 -jointOrient;')
+        if i<10:
+            cm.rename(name[i], 'R_arm_IK_JNT_'+str(0)+str(i+1))     
+        else:
+            cm.rename(name[i], 'R_arm_IK_JNT_'+str(i+1))
+    cm.select('R_arm_IK_JNT_02')
+    maya.mel.eval('rotate -r -eu -fo 0 -2.88 0 ;')
+    maya.mel.eval('joint -e -spa -ch;')
+    cm.setAttr('R_arm_IK_JNT_02.rotateY', .2)
+    
+    piv1 = cm.xform('R_arm_IK_JNT_01', q=True, t=True, ws=True) 
+    piv2 = cm.xform('R_arm_IK_JNT_02', q=True, t=True, ws=True)
+    piv3 = cm.xform('R_arm_IK_JNT_04', q=True, t=True, ws=True) 
+    cm.select(deselect=True)
+    cm.joint(p=(piv1[0], piv1[1], piv1[2]), n='R_arm_FK_JNT_01') 
+    cm.joint(p=(piv2[0], piv2[1], piv2[2]), n='R_arm_FK_JNT_02')
+    cm.joint(p=(piv3[0], piv3[1], piv3[2]), n='R_arm_FK_JNT_03')
+    cm.select(deselect=True)
+    cm.joint(p=(piv1[0], piv1[1], piv1[2]), n='R_arm_result_JNT_01')
+    cm.joint(p=(piv2[0], piv2[1], piv2[2]), n='R_arm_result_JNT_02')
+    cm.joint(p=(piv3[0], piv3[1], piv3[2]), n='R_arm_result_JNT_03')
+    
+    cm.select(deselect=True)
+    maya.mel.eval('select -r R_arm_IK_JNT_01.rotatePivot;')
+    maya.mel.eval('select -tgl R_arm_IK_JNT_03.rotatePivot;')    
+    maya.mel.eval('ikHandle -p 25 -sol ikRPsolver;')
+    cm.rename('ikHandle1', 'R_arm_IK_HDL')
+    cm.rename('effector1', 'R_arm_IK_EFF')
+    
+    cm.select(deselect=True)
+    piv = cm.xform('R_arm_IK_JNT_04', t=True, q=True, ws=True)
+    cm.select(deselect=True)
+    cm.xform('R_arm_IK_EFF', piv=(piv[0], piv[1], piv[2]), ws=True)
+    
+    for i in range(1,4):
+        cm.createNode('blendColors', n='R_arm_IK_blend'+str(i))
+        cm.connectAttr('R_arm_FK_JNT_0'+str(i)+'.rotate', 'R_arm_IK_blend'+str(i)+'.color1')
+        cm.connectAttr('R_arm_IK_JNT_0'+str(i)+'.rotate', 'R_arm_IK_blend'+str(i)+'.color2')
+        cm.connectAttr('R_arm_IK_blend'+str(i)+'.output', 'R_arm_result_JNT_0'+str(i)+'.rotate')
+        cm.connectAttr('R_arm_IK_HDL.ikBlend', 'R_arm_IK_blend'+str(i)+'.blender')
+    
+    
+    
+def ctrlSelect(_ctrlNumber):
+    if cm.objExists('torus_CTRL'):
+        print 'CTRLS exist!'
+    else:
+        maya.mel.eval('file -import -type "mayaAscii"  -ignoreVersion -ra true -mergeNamespacesOnClash false -namespace "CTRL_group" -options "v=0;"  -pr "/Users/ellieansell/Documents/maya/projects/default/scripts/CTRL group.ma";')
+        cm.rename('*torus_CTRL', 'torus_CTRL')
+        cm.rename('*diamond_CTRL', 'diamond_CTRL')
+        cm.rename('*circle_CTRL', 'circle_CTRL')
+        cm.rename('*cube_CTRL', 'cube_CTRL')
+        cm.select('*_CTRL')
+        
+    if _ctrlNumber==1:   #selects Torus
+        moveCtrlTo = cm.xform(q=True, t=True, ws=True) 
+        cm.duplicate('torus_CTRL', n='new_Torus_CTRL')
+        cm.move(moveCtrlTo[0], moveCtrlTo[1], moveCtrlTo[2], 'new_Torus_CTRL', ws=True)
+        cm.select('new_Torus_CTRL')
+    elif _ctrlNumber==2:   #selects Diamond  
+        moveCtrlTo = cm.xform(q=True, t=True, ws=True) 
+        cm.duplicate('diamond_CTRL', n='new_Diamond_CTRL')
+        cm.move(moveCtrlTo[0], moveCtrlTo[1], moveCtrlTo[2], 'new_Diamond_CTRL', ws=True)
+        cm.select('new_Diamond_CTRL')
+    elif _ctrlNumber==3:   #selects Diamond  
+        moveCtrlTo = cm.xform(q=True, t=True, ws=True) 
+        cm.duplicate('circle_CTRL', n='new_Circle_CTRL')
+        cm.move(moveCtrlTo[0], moveCtrlTo[1], moveCtrlTo[2], 'new_Circle_CTRL', ws=True)
+        cm.select('new_Circle_CTRL')
+    elif _ctrlNumber==4:   #selects Diamond  
+        moveCtrlTo = cm.xform(q=True, t=True, ws=True) 
+        cm.duplicate('cube_CTRL', n='new_Cube_CTRL')
+        cm.move(moveCtrlTo[0], moveCtrlTo[1], moveCtrlTo[2], 'new_Cube_CTRL', ws=True)
+        cm.select('new_Cube_CTRL')
+def makeChainbetweenJoints(_divisions):
+    cm.rename(cm.ls(sl=True), 'spline_CRV')
+    cm.rebuildCurve('spline_CRV', ch=True, rpo=True, rt=False, end=True, kr=False, kcp=False, kep=True, kt=False, s=_divisions, tol=0.01) 
+    for i in range(0, _divisions+1):
+        epPos = cm.xform('spline_CRV.ep['+str(i)+']', t=True, q=True)
+        cm.joint(p=(epPos), n='spline_JNT_'+str(i))
+  
+#^-------------------------------------------------------------------------------------------------Rigging^   
+#--------------------------------------------------------------------------------------------------Hair  
+def polytocurve():
+    poly = cm.ls(sl=True)
+    vtxTotal = cm.polyEvaluate(v=True)
+    vtxCoordList = []
+    
+    for i in range(0, vtxTotal, 2):
+        cm.select(poly[0]+'.vtx['+str(i)+']', add=True)
+        
+    for i in range(1, vtxTotal, 2):
+        cm.select(poly[0]+'.vtx['+str(i)+']', add=True)
+    
+    for i in range(1, vtxTotal, 2):
+        cm.select(deselect=True)
+        cm.select(poly[0]+'.vtx['+str(i)+']', add=True)
+        vtxCoord = cm.xform(q=True, t=True, ws=True) 
+        vtxCoordList.append(vtxCoord)
+    print vtxCoordList
+    cm.softSelect(sse=0)
+    cm.curve(d=1, p=vtxCoordList, n='hairStrand' )      #cm.insertKnotCurve( 'hairStrand', ch=True, p=0.3, nk=2 )
+    
+def rebuildCrv(_depth):    
+    cm.rebuildCurve(cm.ls(sl=True), ch=True, rpo=True, rt=False, end=True, kr=False, kcp=False, kep=True, kt=False, s=_depth, tol=0.01) 
+def makeCurvesDynamic():
+    for i in cm.ls(sl=True):
+        cm.select(i)
+        maya.mel.eval('makeCurvesDynamic 2 { "1", "0", "1", "1", "0"};')
+        cm.setAttr('follicleShape1.pointLock', 1)
+        cm.rename('follicleShape1', 'dynamic_follicle_CRV')
+        cm.rename('follicle1', 'dynamic_follicle')
+#--------------------------------------------------------------------------------------------------^Hair 
+
+def removePartOfName(oldName, replaceName):
+    name=cm.ls(sl=True)
+    for i in range(0, len(name)):
+        newName =  name[i].replace(str(oldName),str(replaceName),1)
+        cm.rename(name[i], newName) 
+               
+def renameGUI(wtitle):
+  windowID = 'Rename' 
+  if cm.window(windowID, exists=True):
+      cm.deleteUI(windowID) 
+  mainLayout = cm.window(windowID, title=wtitle, w=20, h=40, bgc=(0.235,0.226,0.3), tlb=True) 
+  tab = cm.tabLayout( innerMarginWidth=5, innerMarginHeight=5, p=mainLayout)
+  
+  row1 = cm.rowColumnLayout( "rename", numberOfRows=3, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=tab)
+  row2 = cm.rowColumnLayout( "model", numberOfRows=2, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=tab)
+  row3 = cm.rowColumnLayout( "Render Layers", numberOfRows=2, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=tab)
+  row3Columns = cm.rowColumnLayout( "renderingColumns", numberOfColumns=5, bgc=(0.8,0.9,0.6), p=row3)
+  lightingColumns = cm.rowColumnLayout( "LightingColumns", numberOfColumns=2, bgc=(0.8,0.9,0.6), p=tab)
+  lightCol1 = cm.rowColumnLayout( "LightCol1", numberOfRows=16, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=lightingColumns)
+  lightCol2 = cm.rowColumnLayout( "LightCol2", numberOfRows=16, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=lightingColumns)
+  
+  
+  row5 = cm.rowColumnLayout( "Rigging", numberOfRows=2, rowHeight=[(1, 200), (2, 200)], bgc=(0.8,0.9,0.6), p=tab)
+  rigTab = cm.tabLayout( innerMarginWidth=5, innerMarginHeight=5, p=row5)
+  arms = cm.rowColumnLayout( "Arms", numberOfRows=20, rowHeight=[(1, 40), (2, 40)], bgc=(0.8,0.9,0.6), p=rigTab)
+  
+  hair = cm.rowColumnLayout( "Hair", numberOfRows=4, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=tab)
+  
+  legs = cm.rowColumnLayout( "Legs", numberOfRows=20, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=rigTab)
+  
+  useful = cm.rowColumnLayout( "Useful", numberOfRows=20, rowHeight=[(1, 20), (2, 20)], bgc=(0.8,0.9,0.6), p=rigTab)
+  cm.textFieldGrp( 'name', label='name:',p=row1) 
+  cm.textFieldGrp( 'oldName', label='Old Name:',p=row1) 
+  cm.textFieldGrp( 'replaceName', label='Replace Name:',p=row1) 
+  
+  
+  #cm.text('Super renaming GUI!', p=row1) 
+  cm.button("1", l=" JNT ", al="center", bgc = (0.5, 0.5, 0.2), command=one, p=row1)
+  cm.button("2", l=" HDL ", al="center", bgc = (0.5, 0.6, 0.3), command=two, p=row1)
+  cm.button("3", l=" CTRL ", al="center", bgc = (0.5, 0.7, 0.4), command=three, p=row1)
+  cm.button("4", l=" GRP ", al="center", bgc = (0.5, 0.8, 0.5), command=four, p=row1)
+  cm.button("5", l=" EFF ", al="center", bgc = (0.5, 0.9, 0.6), command=five, p=row1)
+  cm.button("6", l=" CRV ", al="center", bgc = (0.4, 0.8, 0.7), command=six, p=row1)
+  cm.button("7", l=" CLST ", al="center", bgc = (0.3, 0.8, 0.8), command=seven, p=row1)
+  cm.button("8", l=" LOC ", al="center", bgc = (0.2, 0.8, 0.9), command=eight, p=row1)
+  cm.button("9", l=" GEO ", al="center", bgc = (0.2, 0.8, 0.9), command=nine, p=row1)
+  cm.button("9.1", l=" LHT ", al="center", bgc = (0.5, 0.7, 0.5), command=LHT, p=row1)
+  cm.button("10", l=" Replace ", al="center", bgc = (0.4, 0.2, 0.3), command=ten, p=row1)
+  
+  cm.button("11", l=" PIV CENTER ", al="center", bgc = (0.2, 0.8, 0.9), command=pivcenter, p=row2)
+  cm.button("11", l=" FLATTEN ", al="center", bgc = (0.2, 0.6, 0.9), command=flat, p=row2)
+  cm.button("12", l=" 1.Query Height ", al="center", bgc = (0.2, 0.4, 0.9), command=sameHeight, p=row2)
+  cm.button("13", l=" 2.Move to Height ", al="center", bgc = (0.2, 0.4, 0.9), command=moveToHeight, p=row2)
+  
+  cm.showWindow(windowID)
+  
+  #---------Lighting settings
+  cm.button("14", l="Assign objectID", al="center", bgc = (0.7, 0.4, 0.9), command=assignObjectID, p=row3)
+  cm.button("red", l="RedSurfaceShader", al="center", bgc = (1, 0, 0), command=redSS, p=row3Columns)
+  cm.button("green", l="GreenSurfaceShader", al="center", bgc = (0, 1, 0), command=greenSS, p=row3Columns)
+  cm.button("blue", l="BlueSurfaceShader", al="center", bgc = (0, 0, 1), command=blueSS, p=row3Columns)
+  cm.button("black", l="BlackSurfaceShader", al="center", bgc = (0, 0, 0), command=blackSS, p=row3Columns)
+  cm.button("white", l="WhiteSurfaceShader", al="center", bgc = (.9, .9, .9), command=whiteSS, p=row3Columns)
+  
+  cm.textFieldGrp( 'attribute', label='Attribute',p=lightCol1) 
+  cm.floatSliderGrp('valueFloatSingle', field=True, label='Value', minValue=1, maxValue=64, fieldMinValue=-100, fieldMaxValue=100, value=32, p=lightCol1)
+  cm.button("attriubteSet", l=" Set ", al="center", bgc = (0.8, 0.7, 0.9), command=attributeSet, p=lightCol1)
+  
+  
+  cm.textFieldGrp( 'attribute2', label='Attribute',p=lightCol2) 
+  cm.floatFieldGrp('valueFloat', numberOfFields=3, label='multiplier', value1=1, value2=1, value3=1 , p=lightCol2)
+  cm.button("attriubteSet2", l=" Set ", al="center", bgc = (0.8, 0.9, 0.9), command=attributeSet2, p=lightCol2)
+  
+  cm.button("Vray Subdivisions", l="Vray Subdivisions", al="center", bgc = (.9, .9, .9), command=setVraySubdivisions, p=row3)
+  
+  #armsColumns = cmds.gridLayout( numberOfColumns=2, cellWidthHeight=(50, 50) , p=arms)
+  armsColumns = cm.rowColumnLayout( "RiggingColumns", numberOfColumns=6, bgc=(0.6,0.9,0.6), p=arms)
+  cm.button("autoIKarm", l="R IK Arm", bgc = (.9, .9, .9), command=autoIKArmRig, p=armsColumns)
+  cm.button("Elbow", l="Elbow", bgc = (.9, .9, .9), command=makeElbow, p=armsColumns)
+  cm.button("IK Wrist", l="IK Wrist", bgc = (.9, .9, .9), command=makeIKWrist, p=armsColumns)
+
+  
+  cm.radioButtonGrp( label='Ctrl', labelArray4=['Torus', 'Diamond', 'Circle', 'Cube'], numberOfRadioButtons=4, onCommand1='ctrlSelect(1)', onCommand2='ctrlSelect(2)', onCommand3='ctrlSelect(3)', onCommand4='ctrlSelect(4)', p=arms)
+  cm.button("freezeTransformation", l="Freeze trans", al="center", bgc = (.9, .9, .9), command=freezeTransformation, p=arms)
+  cm.text(label='Make the auto IK arm by selecting the joint heirachy, clicking R IK Arm.',p=arms) 
+  
+  #---------Bendy subdivision chains
+  cm.text(l='Click the first object and last object you want the chain to be between.', p=useful) 
+  cm.intSliderGrp('subdivisionCurve', field=True, label='subdiv Curve', minValue=1, maxValue=64, fieldMinValue=1, fieldMaxValue=100, value=8, p=useful)
+  cm.button("Make chain", l="Make jnt chain between points", al="center", bgc = (.9, .9, .9), command=makeChain, p=useful)
+  cm.button("Make Dynamic", l="Make Dynamic", al="center", bgc = (.9, .9, .9), command=makeDynamic, p=useful)
+  cm.floatSliderGrp('braidWidth', field=True, label='Braid width', minValue=0.1, maxValue=2.0, fieldMinValue=1, ss=0.01, s=0.01, fieldMaxValue=10, value=1, p=useful)  
+  cm.button("Make Plait", l="Curve to Plait", al="center", bgc = (.9, .9, .9), command=makePlait, p=useful)
+  cm.button("Lock node", l="Lock node", al="center", bgc = (.9, .9, .9), command=lockThisNode, p=useful)
+  cm.button("Unlock Node", l="Unlock node", al="center", bgc = (.9, .9, .9), command=unlockThisNode, p=useful)
+
+#---------Poly to Hair
+  #cm.intField( 'hairDepth', minValue=0, maxValue=16, value=6 )
+  cm.intSliderGrp('_hairDepth', field=True, label='Depth', minValue=1, maxValue=64, fieldMinValue=2, fieldMaxValue=100, value=8, p=hair)
+  cm.button("Poly to curve", l="Poly to curve", al="center", bgc = (.9, .9, .9), command=polytoCurve, p=hair)
+  cm.button("rebuildCrvButton", l="Rebuild", al="center", bgc = (.9, .9, .9), command=rebuildCrvButton, p=hair)
+  cm.text(label='Paint a paint effects stroke and select it to get settings from the selected stroke.',p=hair)
+  cm.button("makeCurveDynamicButton", l="Make curves dynamic", al="center", bgc = (.9, .9, .9), command=makeCurvesDynamicButton, p=hair)
+  
+  
+def one(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 1)
+def two(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 2)
+def three(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 3)
+def four(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 4)
+def five(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 5)
+def six(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 6)
+def seven(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 7)
+def eight(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 8)
+def nine(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 9)
+def LHT(*pArgs):
+    name=cm.textFieldGrp('name', q=True, tx=True)
+    renameSelection(str(name), 10)
+def ten(*pArgs):
+    oldName=cm.textFieldGrp('oldName', q=True, tx=True)
+    replaceName=cm.textFieldGrp('replaceName', q=True, tx=True)
+    removePartOfName(oldName, replaceName)
+
+#--------------MODEL--------------------#
+def pivcenter(*pArgs):
+    cm.xform(cm.ls(sl=True), piv=(0,0,0))
+def flat(*pArgs):
+    cm.move(0,0,0, cm.ls(sl=True), moveY=True, ws=True, a=True)
+def moveToHeight(*pArgs):
+    list=cm.ls(sl=True)
+    cm.select(list[0:])
+    cm.move(height[1], moveY=True)
+def sameHeight(*pArgs):
+    global height
+    height= cm.xform(cm.ls(sl=True), q=True, t=True, ws=True)
+    print 'Translate Y:', height[1]
+    
+#--------------RENDER--------------------#
+def assignObjectID(*pArgs):
+    assignObjectID(cm.ls(sl=True))
+def redSS(*pArgs):
+    assignSurfaceShader(1)
+def greenSS(*pArgs):
+    assignSurfaceShader(2)
+def blueSS(*pArgs):
+    assignSurfaceShader(3)
+def blackSS(*pArgs):
+    assignSurfaceShader(4)
+def whiteSS(*pArgs):
+    assignSurfaceShader(5)
+#--------------LIGHTING--------------------#
+def setVraySubdivisions(*pArgs):
+    vraySubdivisions()
+
+def attributeSet(*pArgs):
+    _value = cm.intField('value', q=True, v=True)
+    _multiplier = cm.intField('multiplier', q=True, v=True)
+    _attribute = cm.textField('attribute', q=True, v=True)
+    setAttribute(_value, _multiplier, _attribute)    
+
+#--------------LIGHTING--------------------#
+def autoIKArmRig(*pArgs):
+    autoIKRightArmRig()
+def makeElbow(*Args):
+    cm.rename(cm.ls(sl=True), 'R_elbow_CTRL')
+    cm.select('R_elbow_CTRL', 'R_arm_IK_HDL')
+    maya.mel.eval('poleVectorConstraint -weight 1;')
+    print 'Elbow complete.'
+def makeIKWrist(*Args): 
+    cm.rename(cm.ls(sl=True), 'R_wrist_IK_CTRL')
+    
+    cm.select('R_wrist_IK_CTRL', 'R_arm_IK_HDL')
+    maya.mel.eval('doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","1","","1" };')  
+    cm.select('R_wrist_IK_CTRL', 'R_arm_IK_JNT_04') 
+    maya.mel.eval('doCreateOrientConstraintArgList 1 { "1","0","0","0","0","0","0","1","","1" };')
+    #maya.mel.eval('setAttr -lock true -keyable false -channelBox false "R_wrist_IK_CTRL.sx";')
+    #maya.mel.eval('setAttr -lock true -keyable false -channelBox false "R_wrist_IK_CTRL.sy";')
+    #maya.mel.eval('setAttr -lock true -keyable false -channelBox false "R_wrist_IK_CTRL.sz";')
+    cm.setAttr('R_wrist_IK_CTRL.sx', lock=True, keyable=False, channelBox=False)
+    cm.setAttr('R_wrist_IK_CTRL.sy', lock=True, keyable=False, channelBox=False)
+    cm.setAttr('R_wrist_IK_CTRL.sz', lock=True, keyable=False, channelBox=False)
+    piv1 = cm.xform('R_arm_IK_JNT_01', q=True, t=True, ws=True) 
+    piv3 = cm.xform('R_arm_IK_JNT_04', q=True, t=True, ws=True)
+    
+    cm.distanceDimension(ep=(piv3[0],piv3[1],piv3[2]), sp=(piv1[0],piv1[1], piv1[2]))
+    cm.rename('locator2', 'R_arm_Dictance_LOC') 
+    cm.rename('distanceDimensionShape1', 'R_arm_Distance') 
+    cm.parent('R_arm_Dictance_LOC', 'R_wrist_IK_CTRL')
+    originalDistance = cm.getAttr('R_arm_Distance.distance')
+    cm.createNode('multiplyDivide', n='R_arm_stretchRatio_Calculator')
+    #cm.connectAttr('R_arm_Distance.distance', 'R_arm_stretchRatio_Calculator.input1.input1X')
+    cm.setAttr('R_arm_stretchRatio_Calculator.input2.input2X', originalDistance)
+    cm.setAttr('R_arm_stretchRatio_Calculator.operation', 2)
+    
+    cm.createNode('condition', n='Condition_distance_greaterThanOrig')
+    cm.setAttr('Condition_distance_greaterThanOrig.secondTerm', originalDistance)
+    cm.connectAttr('R_arm_Distance.distance', 'Condition_distance_greaterThanOrig.firstTerm')
+    cm.setAttr('Condition_distance_greaterThanOrig.operation', 2)
+    cm.setAttr('Condition_distance_greaterThanOrig.colorIfFalseR', originalDistance)
+    cm.connectAttr('R_arm_Distance.distance', 'Condition_distance_greaterThanOrig.colorIfTrueR')
+    
+    cm.connectAttr('Condition_distance_greaterThanOrig.outColor', 'R_arm_stretchRatio_Calculator.input1')
+    #cm.connectAttr('Condition_distance_greaterThanOrig.colorIfTrueR', 'R_arm_stretchRatio_Calculator.input1.input1X')
+    #cm.connectAttr('Condition_distance_greaterThanOrig.colorIfFalseR', 'R_arm_stretchRatio_Calculator.input1.input1X')
+
+    for i in range(1,4):
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_FK_JNT_0'+str(i)+'.scale.scaleX')
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_FK_JNT_0'+str(i)+'.scale.scaleY')
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_FK_JNT_0'+str(i)+'.scale.scaleZ')
+        
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_IK_JNT_0'+str(i)+'.scale.scaleX')
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_IK_JNT_0'+str(i)+'.scale.scaleY')
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_IK_JNT_0'+str(i)+'.scale.scaleZ')
+        
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_result_JNT_0'+str(i)+'.scale.scaleX')
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_result_JNT_0'+str(i)+'.scale.scaleY')
+        cm.connectAttr('R_arm_stretchRatio_Calculator.output.outputX', 'R_arm_result_JNT_0'+str(i)+'.scale.scaleZ')
+    
+    print originalDistance
+    print 'IK Wrist complete.'
+    
+def freezeTransformation(*pArgs):
+    maya.mel.eval('makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 -pn 1 -jointOrient;')
+    
+    #----------------
+def makeChain(*pArgs):
+    _divisions = cm.intSliderGrp('subdivisionCurve', q=True, v=True)
+    makeChainbetweenJoints(_divisions)
+def makeDynamic(*pArgs):
+    cm.select('spline_CRV')
+    maya.mel.eval('makeCurvesDynamic 2 { "1", "0", "1", "1", "0"};')
+    #cm.delete('effector1')
+    #cm.setAttr('follicleShape1.pointLock', 1)
+    _no_ofJoints = cm.intSliderGrp('subdivisionCurve', q=True, v=True)
+    cm.setAttr('follicle1.pointLock', 1)
+    cm.select('spline_JNT_0', r=True)
+    cm.select('spline_JNT_'+str(_no_ofJoints), add=True)
+    cm.select('curve1', add=True)
+    maya.mel.eval('ikHandle -sol ikSplineSolver -ccv false;')
+    
+    #maya.mel.eval('setAttr "splineHair_un_FOL.pointLock" 1;')
+    cm.rename('curve1', 'DONE_curve1_CRV')
+    cm.rename('spline_CRV', 'DONE_splineCRV')
+    cm.rename('follicle1', 'DONE_follicle')
+    cm.rename('hairSystem1Follicles', 'DONE_hairSystem1Follicles')
+    cm.rename('hairSystem1OutputCurves', 'DONE_hairSystem1OutputCurves')
+    cm.rename('hairSystem1', 'DONE_hairSystem')
+    cm.rename('nucleus1', 'DONE_nucleus')
+    cm.rename('ikHandle1', 'DONE_ikHandle')
+    cm.select('spline_JNT_0', hi=True)
+    cm.select('DONE*')
+    
+    for i in cm.ls(sl=True):
+        cm.rename(i, 'DONE_'+str(i), ignoreShape=True)
+        
+def makePlait(*pArgs):
+    _depth = cm.intSliderGrp('subdivisionCurve', q=True, v=True)
+    _width = cm.floatSliderGrp('braidWidth', q=True, v=True)
+    
+    #_depth*=2
+    _width*=2
+    cm.rename('braid_CRV')
+    cm.rebuildCurve(cm.ls(sl=True), ch=True, rpo=True, rt=False, end=True, kr=False, kcp=False, kep=True, kt=False, s=_depth, tol=0.01) 
+    
+    piv1 = cm.xform('braid_CRV.cv[0]', q=True, t=True, ws=True) 
+    piv3 = cm.xform('braid_CRV.cv['+str(_depth)+']', q=True, t=True, ws=True)
+    cm.distanceDimension(ep=(piv3[0],piv3[1],piv3[2]), sp=(piv1[0],piv1[1], piv1[2]))
+    dist = cm.getAttr('distanceDimension1.distance')
+    
+    moveY = float(dist)/float(_depth/2.0) #1.2
+    
+    if _depth%2!=0:
+        _depth+=1
+    switch=1
+    for i in range(0, _depth):
+        switch*=-1
+        if i%3==0 and switch>0:
+            cm.select('braid_CRV.ep['+str(i+1)+']', add=True)
+            cm.select('braid_CRV.ep['+str(i+2)+']', add=True)
+    cm.move(_width, 0, 0, r=True, os=True)
+
+    cm.select(deselect=True)
+    for i in range(0, _depth):
+        switch*=-1
+        if i%3==0 and switch<0:
+            cm.select('braid_CRV.ep['+str(i+1)+']', add=True)
+            cm.select('braid_CRV.ep['+str(i+2)+']', add=True)
+    cm.move(-_width, 0, 0, r=True, os=True)
+    
+    cm.select(deselect=True)
+    for i in range(0, _depth):
+        if i%3==0:
+            cm.select('braid_CRV.ep['+str(i+1)+']', add=True)
+    cm.move(0, 0, _width*2, r=True, os=True)
+
+    cm.select(deselect=True)
+    for i in range(0, _depth):
+        if i%3==0:
+            cm.select('braid_CRV.ep['+str(i+2)+']', add=True)
+    cm.move(0, 0, -_width*2, r=True, os=True)
+    
+    cm.polyCylinder(n='polyCircle', sx=5, sy=0, sz=1)
+    cm.select('polyCircle.f[0:9]')
+    cm.delete()
+    piv = cm.xform('braid_CRV.cv[0]', q=True, t=True, ws=True)
+    cm.move(piv[0], piv[1], piv[2], 'polyCircle', ws=True, a=True)
+    float(moveY)
+    cm.scale(float(moveY*0.1), float(moveY*0.1), float(moveY*0.05), 'polyCircle', os=True)
+    
+    cm.select('polyCircle.f[0:4]', add=True)    
+    
+    maya.mel.eval('polyExtrudeFacet -constructionHistory 1 -keepFacesTogether 1 -pvx 0.09549146891 -pvy 21.69501618 -pvz -25.49619563 -divisions 1 -twist 0 -taper 1 -off 0 -thickness 0 -smoothingAngle 30 -inputCurve braid_CRV  polyCircle.f[0:4];')    
+    cm.setAttr('polyExtrudeFace1.divisions', 50) #make unique
+    
+    maya.mel.eval('polyNormal -normalMode 0 -userNormalMode 0 -ch 1 polyCircle;')
+    cm.duplicate('polyCircle', n='polyCircle2')
+    cm.move(0, float(moveY), 0, 'polyCircle2', r=True)
+   # cm.move(0, float(_depth/moveY), 0, 'polyCircle2', r=True)
+    
+    cm.duplicate('polyCircle2', n='polyCircle3')
+    cm.move(0, float(moveY), 0, 'polyCircle3', r=True)
+    #cm.move(0, float(_depth/moveY), 0, 'polyCircle3', r=True)
+    print _depth
+    cm.polyUnite('polyCircle*', n='DONE_braid')
+    
+    maya.mel.eval('DeleteHistory;')
+    cm.rename('braid_CRV', 'DONE_braid') 
+    cm.delete('distanceDimension1', 'locator1', 'locator2')
+    
+#0%            
+            
+'''   
+maya.mel.eval('select -r spline_JNT_0 ;')
+maya.mel.eval('select -add spline_JNT_8 ;')
+maya.mel.eval('select -add curve1 ;')
+maya.mel.eval('ikHandle -sol ikSplineSolver -ccv false;')
+
+cm.select('braid_CRV.ep['+str(i-1)+']', add=True)
+cm.move(0, 0, _width, r=True, os=True)
+cm.select(deselect=True)
+
+    piv1 = cm.xform('braid_CRV.cv[0]', q=True, t=True, ws=True) 
+    piv3 = cm.xform('braid_CRV.cv['+str(_depth)+']', q=True, t=True, ws=True)
+    
+    cm.distanceDimension(ep=(piv3[0],piv3[1],piv3[2]), sp=(piv1[0],piv1[1], piv1[2]))
+    dist = cm.getAttr('distanceDimension1.distance')
+    
+'''
+
+def lockThisNode(*pArgs):
+    cm.lockNode(cm.ls(sl=True)) 
+    
+def unlockThisNode(*pArgs):
+    cm.lockNode(cm.ls(sl=True), lock=False)
+#objects = pm.ls(selection=True, dag=True, type="joint")
+#---------------------------------------------poly to hair
+def polytoCurve(*pArgs):
+    polytocurve()
+    
+def rebuildCrvButton(*pArgs):
+    _depth = cm.intSliderGrp('_hairDepth', q=True, v=True)
+    print 'hairDepth', _depth
+    rebuildCrv(_depth)
+def makeCurvesDynamicButton(*pArgs):
+    makeCurvesDynamic()
+
+def setVraySubdivisions(*pArgs):
+    vraySubdivisions()
+    
+def attributeSet(*pArgs):
+    _value = cm.floatSliderGrp('valueFloatSingle', q=True, v=True)
+    _attribute = cm.textFieldGrp('attribute', q=True, tx=True)
+    setAttribute(_value, _attribute)
+def attributeSet2(*pArgs):
+    _v1 = cm.floatFieldGrp('valueFloat', q=True, v1=True)
+    _v2 = cm.floatFieldGrp('valueFloat', q=True, v2=True)
+    _v3 = cm.floatFieldGrp('valueFloat', q=True, v3=True)
+    _attribute = cm.textFieldGrp('attribute2', q=True, tx=True)
+    setAttribute2(_v1, _v2, _v3, _attribute)
+
+renameGUI('rename')
